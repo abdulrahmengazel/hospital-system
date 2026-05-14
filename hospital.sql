@@ -634,6 +634,8 @@ ALTER TABLE public.hastalaboratuvar
 ALTER TABLE public.hastalaboratuvar
     ADD CONSTRAINT hastalaboratuvar_laboratuvar_id_fkey
     FOREIGN KEY (laboratuvar_id) REFERENCES public.laboratuvar (laboratuvar_id)
+    -- RESTRICT: prevents deleting a laboratory that has patient associations,
+    -- preserving the referential integrity of historical test records.
     ON UPDATE NO ACTION ON DELETE RESTRICT;
 
 -- hastaziyaretci

@@ -7,7 +7,7 @@ appointments, treatments, surgeries, medications, laboratories, and billing.
 
 ### Prerequisites
 
-- PostgreSQL 13 or later
+- PostgreSQL 10 or later (ENUM types, triggers, and views used here are supported since PostgreSQL 9.1; version 10+ is recommended for security and performance)
 
 ### Create and load the database
 
@@ -113,7 +113,13 @@ been removed from `ilac`; relationships are now expressed exclusively through th
 `bolum.bolumsorumlusu_id` is a foreign key to `personel`, replacing the old free-text
 varchar column and enforcing referential integrity.
 
-### Circular FK: `tedavi` ↔ `vezneucreti`
+### Foreign-key delete behaviour
+Most FK columns referencing `hasta` (patient) use `ON DELETE CASCADE` so that all records
+are cleaned up when a patient is removed. References to staff (doktor, hemsire, personel)
+use `ON DELETE SET NULL` to preserve historical records after a staff member leaves.
+The `hastalaboratuvar.laboratuvar_id` FK uses `ON DELETE RESTRICT` — a laboratory cannot
+be deleted while patient associations exist, since those associations carry historical
+diagnostic significance.
 Both `tedavi.vezneucret_id` and `vezneucreti.tedavi_id` are nullable. When inserting
 linked pairs, insert `tedavi` first (with `vezneucret_id = NULL`), then `vezneucreti`,
 then `UPDATE tedavi SET vezneucret_id = ...`.
